@@ -93,6 +93,7 @@ function HeroSection({ data }) {
         {content.cta ? (
           <div className="hero-actions">
             <CtaButton href={content.cta.link} label={content.cta.text} />
+            <a className="cta-secondary" href="/blog">Blog</a>
           </div>
         ) : null}
       </div>
