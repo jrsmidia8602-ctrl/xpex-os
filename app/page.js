@@ -7,7 +7,7 @@ const hubConfig = {
       type: "hero",
       background: "#0a0a0a",
       content: {
-        logo: "/logo-xmenteia.png",
+        logo: "https://cdn.builder.io/api/v1/image/assets%2F57bd8ab362ad44d49f58eb09ed32ad9a%2F48b2612c1a5b4d15887cf64fa953f459?format=webp&width=800",
         headline: "🚀 Bem-vindo ao HUB XMENTE.I.A",
         subheadline: "Guias, Ferramentas e Cursos para dominar a Inteligência Artificial",
         cta: { text: "Explorar Agora", link: "#guias" },
