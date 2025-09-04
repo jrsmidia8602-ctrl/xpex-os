@@ -86,9 +86,6 @@ function HeroSection({ data }) {
             className="brand-logo"
             src={content.logo}
             alt="Logo XMENTE.I.A"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
           />
         ) : null}
         <h1 className="hero-headline">{content.headline}</h1>
