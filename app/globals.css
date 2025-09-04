@@ -41,6 +41,27 @@ body { color: var(--foreground); background: var(--background); font-family: ui-
 .card-action { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border-radius: 8px; background: #1f2937; color: #e5e7eb; text-decoration: none; border: 1px solid rgba(255,255,255,.08); transition: background .2s ease, color .2s ease, transform .15s ease; }
 .card-action:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
 
+/* Details: Two-column */
+.split-section { padding: 48px 24px; background: var(--background); }
+.split-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 480px 1fr; gap: 24px; align-items: center; }
+.split-media { width: 100%; height: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,.06); box-shadow: 0 2px 10px rgba(0,0,0,.35); }
+.split-content { color: var(--foreground); }
+.feature-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; }
+.feature-item { background: #0f172a; color: #cbd5e1; border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 10px 12px; }
+
+/* Details: Testimonials */
+.testimonial-section { padding: 48px 24px; background: var(--background); }
+.testimonial-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.testimonial-card { background: #111; border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 18px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 1px solid rgba(255,255,255,.1); }
+.testimonial-text { margin: 0 0 8px; color: #e5e7eb; }
+.testimonial-author { color: #94a3b8; font-size: 14px; }
+
+/* Details: CTA band */
+.cta-band { padding: 40px 24px; }
+.cta-band-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.cta-band-title { margin: 0; color: #e5e7eb; font-size: 20px; }
+
 /* Responsive (keep same breakpoint) */
 @media (max-width: 640px) {
   .hero-container { padding: 40px 18px; }
@@ -49,4 +70,7 @@ body { color: var(--foreground); background: var(--background); font-family: ui-
   .hero-subheadline { font-size: 14px; }
   .section-block { padding: 32px 18px; }
   .card-grid { grid-template-columns: 1fr; gap: 12px; }
+  .split-inner { grid-template-columns: 1fr; }
+  .testimonial-grid { grid-template-columns: 1fr; }
+  .cta-band-inner { flex-direction: column; align-items: flex-start; }
 }
