@@ -1,0 +1,30 @@
+%% Arquitetura KOS (Kernel-Orchestrator-Swarm) - XPEX Systems
+%% Use este arquivo para importar para slides ou visualizadores Mermaid
+
+flowchart TD
+    subgraph Camada0[Camada 0: Usuário (Sensor & Banco)]
+        A[Brave Browser + Extensão XPEX] -->|Sinais + Consentimento| B(Dashboard OS / Next.js)
+        A -->|Wallet / Assinatura| C{Web3 / Pagamentos}
+    end
+
+    subgraph Camada1[Camada 1: Orquestração (Nervos)]
+        B -->|Comando API| D[Orchestrator (Node.js)]
+        D -->|Filas de Tarefas| E[Redis / BullMQ]
+        C -->|Confirmação On-Chain| D
+    end
+
+    subgraph Camada2[Camada 2: Cérebro & Execução (Core)]
+        E -->|Disparo| F[Agent Kernel (Rust / Edge)]
+        F -->|Memória Curta| R[Redis]
+        F -->|Memória Longa| G[(Postgres + Vector DB)]
+        F -->|Execução Pesada| H[Swarm: Agentes Autônomos (containers/funklets)]
+    end
+
+    subgraph Camada3[Camada 3: Feedback Loop]
+        H -->|Logs & Resultados| G
+        H -->|Receita Gerada| C
+        G -->|Aprendizado & Atualização| F
+    end
+
+    classDef infra fill:#f8f9fa,stroke:#bbb
+    class Camada1,Camada2,Camada3,Camada0 infra

@@ -1,0 +1,16 @@
+{
+  "name": "xpex-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:all": "docker compose up --build",
+    "start": "echo \"Use 'docker compose up --build' to run the stack\""
+  },
+  "devDependencies": {
+    "turbo": "^1.10.7"
+  }
+}

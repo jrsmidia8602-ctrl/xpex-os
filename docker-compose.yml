@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # --- DATA LAYER ---
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: xpex_admin
+      POSTGRES_PASSWORD: xpex_secure_password
+      POSTGRES_DB: xpex_core
+    ports: ["5432:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports: ["6379:6379"]
+    volumes:
+      - redis_data:/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports: ["6333:6333"]
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  # --- APPLICATION LAYER ---
+  kernel:
+    build: 
+      context: ./apps/kernel
+      dockerfile: Dockerfile
+    ports: ["8080:8080"]
+    environment:
+      DATABASE_URL: postgres://xpex_admin:xpex_secure_password@postgres:5432/xpex_core
+      REDIS_URL: redis://redis:6379
+    depends_on: [postgres, redis]
+
+  orchestrator:
+    build:
+      context: ./apps/orchestrator
+      dockerfile: Dockerfile
+    ports: ["8081:8081"]
+    environment:
+      KERNEL_URL: http://kernel:8080
+      REDIS_URL: redis://redis:6379
+      SOLANA_RPC: https://api.devnet.solana.com
+    depends_on: [kernel, redis]
+
+  dashboard:
+    build:
+      context: ./apps/dashboard
+      dockerfile: Dockerfile
+    ports: ["3000:3000"]
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8081 # Front fala com Orchestrator
+    depends_on: [orchestrator]
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:

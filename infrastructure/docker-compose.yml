@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: xpex
+      POSTGRES_PASSWORD: xpexpassword
+      POSTGRES_DB: xpexdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  vector-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: vect
+      POSTGRES_PASSWORD: vectpass
+      POSTGRES_DB: vectdb
+    volumes:
+      - vectdata:/var/lib/postgresql/data
+
+  orchestrator:
+    build: ../apps/orchestrator
+    image: xpex/orchestrator:dev
+    environment:
+      - NODE_ENV=development
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://xpex:xpexpassword@postgres:5432/xpexdb
+    depends_on:
+      - redis
+      - postgres
+    ports:
+      - "3001:3001"
+
+  dashboard:
+    build: ../apps/dashboard
+    image: xpex/dashboard:dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+
+  kernel:
+    image: rust:1.70-slim
+    command: sleep infinity
+
+volumes:
+  pgdata:
+  vectdata:
