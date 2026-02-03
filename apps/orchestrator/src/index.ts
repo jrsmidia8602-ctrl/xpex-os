@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { StateGraph, END } from "@langchain/langgraph";
+import { Connection } from '@solana/web3.js';
 import axios from 'axios';
 
 const app = express();
@@ -12,54 +11,27 @@ const PORT = 8081;
 const KERNEL_URL = process.env.KERNEL_URL || 'http://localhost:8080';
 const SOLANA_CONNECTION = new Connection('https://api.devnet.solana.com');
 
-// --- LANGGRAPH: DEFINIÇÃO DO FLUXO DO AGENTE ---
-// Estado do Agente
-interface AgentState {
-    mission: string;
-    paymentVerified: boolean;
-    data?: any;
+// --- Runner simples: verificação financeira -> execução no Kernel ---
+async function verifyPayment(): Promise<boolean> {
+    console.log('💰 Verificando fundos...');
+    // TODO: implementar verificação on-chain real usando SOLANA RPC
+    return true; // mock
 }
 
-// Nó 1: Verificador Financeiro
-const financialNode = async (state: AgentState) => {
-    console.log("💰 Verificando fundos...");
-    // Lógica real: Checar saldo ou transação on-chain
-    // Mock: Sucesso
-    return { paymentVerified: true };
-};
-
-// Nó 2: Executor (Chama o Kernel Rust)
-const executionNode = async (state: AgentState) => {
-    if (!state.paymentVerified) return { data: "Pagamento pendente" };
-    
-    console.log("⚙️ Enviando para Kernel Rust...");
+async function callKernel(mission: string) {
+    console.log('⚙️ Enviando para Kernel Rust...');
     try {
         const response = await axios.post(`${KERNEL_URL}/api/v1/execute`, {
-            agent_id: "hunter-v1",
-            payload: { context: state.mission },
-            auth_token: "valid-token-123"
+            agent_id: 'hunter-v1',
+            payload: { context: mission },
+            auth_token: 'valid-token-123'
         });
-        return { data: response.data };
+        return response.data;
     } catch (e) {
-        return { data: "Erro no Kernel" };
+        console.error('Erro ao chamar Kernel', e);
+        return { error: 'Erro no Kernel' };
     }
-};
-
-// Construção do Grafo
-const graph = new StateGraph<AgentState>({
-    channels: {
-        mission: { reducer: (x: any) => x },
-        paymentVerified: { reducer: (x: any) => x },
-        data: { reducer: (x: any) => x }
-    }
-})
-.addNode("finance", financialNode)
-.addNode("kernel_exec", executionNode)
-.addEdge("finance", "kernel_exec")
-.addEdge("kernel_exec", END)
-.setEntryPoint("finance");
-
-const runner = graph.compile();
+}
 
 // --- API ENDPOINTS ---
 
@@ -67,13 +39,12 @@ const runner = graph.compile();
 app.post('/api/mission', async (req, res) => {
     const { mission } = req.body;
     console.log(`🤖 Nova missão recebida: ${mission}`);
-    
-    const result = await runner.invoke({ 
-        mission, 
-        paymentVerified: false 
-    });
-    
-    res.json(result);
+    const paymentVerified = await verifyPayment();
+    if (!paymentVerified) {
+      return res.json({ paymentVerified: false, data: null });
+    }
+    const data = await callKernel(mission);
+    res.json({ paymentVerified: true, data });
 });
 
 // 2. Webhook para Solana Pay (Confirmação On-Chain)
